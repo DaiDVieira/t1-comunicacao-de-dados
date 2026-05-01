@@ -53,7 +53,7 @@ codificacao <- vector("character", 2)
 for (i in 1:length(escolha)){
   if(escolha[i] == 1) {
     seq_codificada[i,] <- NRZL(sequencia)
-    codificacao[i] <- "NRZ-I"
+    codificacao[i] <- "NRZ-L"
   }
 }
 
@@ -78,11 +78,12 @@ for(j in 1:ncol(seq_codificada)){   #pontos_seq tem o dobro de linhas da quantid
     pontos_seq[ind_ini, 2*i] = seq_codificada[i,j]    
     pontos_seq[ind_ini+1, 2*i] = seq_codificada[i,j]   
   }
+  max_y <- seq_codificada[,j]
 }
 
 #Sinal transmitido - geracao do grafico
 texto_sequencia <- data.frame(x_pos = seq(0.5, length(sequencia), by = 1),
-                              y_pos = max(df$y) + 0.5, 
+                              y_pos = max(max_y) + 0.5, 
                               label = sequencia)
 
 #Um metodo de codificacao
@@ -104,12 +105,9 @@ ggplot(df, aes(x = x, y = y)) +
 
 
 #comparação entre 2 metodos de codificacao
-colnames(pontos_seq) <- c("x_cod1", "y_cod1", "x_cod2", "y_cod2")
 df <- as.data.frame(pontos_seq) %>%
-  select(x = x_cod1, Codigo_1 = y_cod1, Codigo_2 = y_cod2) %>%
-  pivot_longer(cols = c("Codigo_1", "Codigo_2"), 
-               names_to = "Codificacao", 
-               values_to = "y")
+  select(x = 1, Codigo_1 = 2, Codigo_2 = 4) %>%
+  pivot_longer(cols = c("Codigo_1", "Codigo_2"), names_to = "Codificacao", values_to = "y")
 
 ggplot(df, aes(x = x, y = y)) +
   geom_vline(xintercept = 0:length(sequencia), col = "grey50") +      #separacao dos bits
@@ -123,5 +121,9 @@ ggplot(df, aes(x = x, y = y)) +
   scale_y_continuous(limits = c(-1.5, 1.5), expand = expansion(add = c(0, 0.5))) +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+
+
+
 
 
