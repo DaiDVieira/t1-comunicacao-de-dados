@@ -44,16 +44,41 @@ NRZL <- function(x){
 }
 
 NRZI <- function(x){
-  
+  res <- vector("numeric", length = 2 * length(x))
+  if(x[1] == 0){
+    res[1] <- res[2] <- 1
+  }
+  else{
+    res[1] <- res[2] <- -1
+  }
+  pos <- 3
+  for(i in 2:length(x)){
+    if(x[i] == 0){  # 0 - nao muda
+      res[pos] <- res[pos+1] <- res[pos-1]
+    }
+    else{   # 1 - muda
+      res[pos] <- res[pos+1] <- -1 * res[pos-1]
+    }
+    pos <- pos+2
+  }
+  return(res)
 }
 
 #Codificacao equivalente ao numero escolhido
 seq_codificada <- matrix(0, nrow = length(escolha), ncol = 2 * length(sequencia))
 codificacao <- vector("character", 2)
+extra <- vector("numeric", 4)   #para as sequencias NRZ-I
 for (i in 1:length(escolha)){
+  extra[i*2-1] <- 0
   if(escolha[i] == 1) {
     seq_codificada[i,] <- NRZL(sequencia)
     codificacao[i] <- "NRZ-L"
+    extra[i*2] <- seq_codificada[i, 1]
+  }
+  else if(escolha[i] == 2){
+    seq_codificada[i,] <- NRZI(sequencia)
+    codificacao[i] <- "NRZ-I"
+    extra[i*2] <- 1    #sempre inicia em positivo
   }
 }
 
@@ -91,6 +116,7 @@ plot(pontos_seq[,1], pontos_seq[,2], type = 'l')
 
 df <- as.data.frame(pontos_seq) %>%
   select(x = 1, y = 2)
+df <- df %>% add_row(x = extra[1], y = extra[2], .before = 1)
 
 ggplot(df, aes(x = x, y = y)) +
   geom_vline(xintercept = 0:length(sequencia), col = "grey50") +      #separacao dos bits
@@ -108,6 +134,8 @@ ggplot(df, aes(x = x, y = y)) +
 df <- as.data.frame(pontos_seq) %>%
   select(x = 1, Codigo_1 = 2, Codigo_2 = 4) %>%
   pivot_longer(cols = c("Codigo_1", "Codigo_2"), names_to = "Codificacao", values_to = "y")
+df <- df %>% add_row(x = extra[1], y = extra[2], Codificacao = "Codigo_1", .before = 1)
+df <- df %>% add_row(x = extra[3], y = extra[4], Codificacao = "Codigo_2", .before = 2)
 
 ggplot(df, aes(x = x, y = y)) +
   geom_vline(xintercept = 0:length(sequencia), col = "grey50") +      #separacao dos bits
