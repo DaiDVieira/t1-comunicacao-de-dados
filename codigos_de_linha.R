@@ -165,6 +165,8 @@ cod_2B1Q <- function(x){
     n_ant <- res[pos]
     pos <- pos+4
   }
+  res <- res[-length(res)]
+  res <- res[-length(res)]
   return(res)
 }
 

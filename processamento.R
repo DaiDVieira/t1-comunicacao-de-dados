@@ -78,5 +78,4 @@ for(j in 1:ncol(seq_codificada)){   #pontos_seq tem o dobro de linhas da quantid
     pontos_seq[ind_ini+1, 2*i] = seq_codificada[i,j]   
   }
 }
-max_y <- max(seq_codificada)
-
+max_y <- max(abs(seq_codificada))
